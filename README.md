@@ -16,8 +16,8 @@ A comprehensive setup script and configuration for NeoVim with LaTeX support on 
 
 1. Clone this repository:
 ```bash
-git clone <repository-url>
-cd landscape
+git clone git@github.com:jorgemunozl/arch-nvim-latex.git
+cd arch-nvim-latex
 ```
 
 2. Run the setup script:
