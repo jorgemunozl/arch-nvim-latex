@@ -204,7 +204,7 @@ install_language_servers() {
     
     # Install Python tools using pacman
     print_info "Installing Python tools with pacman..."
-    sudo pacman -S --needed --noconfirm python-pynvim python-black python-isort python-flake8 python-mypy
+    sudo pacman -S --needed --noconfirm python-pynvim python-black python-isort python-flake8 mypy
 }
 
 configure_zathura() {
