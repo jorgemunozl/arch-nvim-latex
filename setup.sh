@@ -202,14 +202,9 @@ install_language_servers() {
         yaml-language-server \
         json-language-server
     
-    # Install Python tools
-    print_info "Installing Python tools..."
-    pip install --user \
-        pynvim \
-        black \
-        isort \
-        flake8 \
-        mypy
+    # Install Python tools using pacman
+    print_info "Installing Python tools with pacman..."
+    sudo pacman -S --needed --noconfirm python-pynvim python-black python-isort python-flake8 python-mypy
 }
 
 configure_zathura() {

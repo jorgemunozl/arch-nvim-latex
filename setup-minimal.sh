@@ -166,10 +166,9 @@ install_language_servers() {
         yaml-language-server \
         json-language-server
     
-    # Install Python tools
-    print_info "Installing Python tools..."
-    pip install --user \
-        pynvim
+    # Install Python tools using pacman
+    print_info "Installing Python tools with pacman..."
+    sudo pacman -S --needed --noconfirm python-pynvim
 }
 
 configure_zathura() {
