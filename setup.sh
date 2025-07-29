@@ -17,11 +17,32 @@ LOG_FILE="install.log"
 exec > >(tee -a "$LOG_FILE")
 exec 2>&1
 
+
 print_header() {
     echo -e "${BLUE}================================${NC}"
     echo -e "${BLUE}  NeoVim LaTeX Setup for Arch  ${NC}"
     echo -e "${BLUE}================================${NC}"
     echo
+}
+
+# Prompt for LaTeX installation level
+choose_latex_install_level() {
+    echo -e "${GREEN}Choose your LaTeX installation level:${NC}"
+    echo "  1) Minimal   - Only core and basic packages (smallest, fastest)"
+    echo "  2) Medium    - Core + recommended + math + fonts (most users)"
+    echo "  3) Full      - Everything (all packages, largest)"
+    echo
+    local choice
+    while true; do
+        read -p "Enter 1 (Minimal), 2 (Medium), or 3 (Full) [2]: " choice
+        case $choice in
+            1) LATEX_LEVEL="minimal"; break;;
+            2|"") LATEX_LEVEL="medium"; break;;
+            3) LATEX_LEVEL="full"; break;;
+            *) echo "Please enter 1, 2, or 3.";;
+        esac
+    done
+    print_info "Selected LaTeX installation: $LATEX_LEVEL"
 }
 
 print_step() {
@@ -83,25 +104,48 @@ install_base_packages() {
 
 install_latex() {
     print_step "Installing LaTeX environment..."
-    
-    local latex_packages=(
-        "texlive-core"
-        "texlive-bin"
-        "texlive-basic"
-        "texlive-latex"
-        "texlive-latexrecommended"
-        "texlive-latexextra"
-        "texlive-fontsrecommended"
-        "texlive-fontsextra"
-        "texlive-formatsextra"
-        "texlive-bibtexextra"
-        "texlive-mathscience"
-        "texlive-publishers"
-        "biber"
-        "zathura"
-        "zathura-pdf-mupdf"
-    )
-    
+    local latex_packages=()
+    if [[ "$LATEX_LEVEL" == "minimal" ]]; then
+        latex_packages=(
+            "texlive-core"
+            "texlive-bin"
+            "texlive-basic"
+            "texlive-latex"
+            "zathura"
+            "zathura-pdf-mupdf"
+        )
+    elif [[ "$LATEX_LEVEL" == "medium" ]]; then
+        latex_packages=(
+            "texlive-core"
+            "texlive-bin"
+            "texlive-basic"
+            "texlive-latex"
+            "texlive-latexrecommended"
+            "texlive-fontsrecommended"
+            "texlive-mathscience"
+            "biber"
+            "zathura"
+            "zathura-pdf-mupdf"
+        )
+    else # full
+        latex_packages=(
+            "texlive-core"
+            "texlive-bin"
+            "texlive-basic"
+            "texlive-latex"
+            "texlive-latexrecommended"
+            "texlive-latexextra"
+            "texlive-fontsrecommended"
+            "texlive-fontsextra"
+            "texlive-formatsextra"
+            "texlive-bibtexextra"
+            "texlive-mathscience"
+            "texlive-publishers"
+            "biber"
+            "zathura"
+            "zathura-pdf-mupdf"
+        )
+    fi
     for package in "${latex_packages[@]}"; do
         print_info "Installing $package..."
         sudo pacman -S --needed --noconfirm "$package"
@@ -314,9 +358,10 @@ show_next_steps() {
     echo "Check the log file for details: $LOG_FILE"
 }
 
+
 main() {
     print_header
-    
+
     # Parse command line arguments
     case "${1:-}" in
         --verify)
@@ -338,7 +383,10 @@ main() {
             exit 0
             ;;
     esac
-    
+
+    # Ask user for LaTeX installation level
+    choose_latex_install_level
+
     # Main installation process
     check_arch
     update_system
@@ -349,7 +397,7 @@ main() {
     install_language_servers
     configure_zathura
     setup_git_hooks
-    
+
     if verify_installation; then
         show_next_steps
     else

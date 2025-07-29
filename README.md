@@ -26,7 +26,36 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-3. Start NeoVim and enjoy your LaTeX environment!
+3. When prompted, choose your LaTeX installation level:
+   - **Minimal**: Only core and basic LaTeX packages (smallest, fastest)
+   - **Medium**: Core + recommended + math + fonts (recommended for most users)
+   - **Full**: Everything (all available LaTeX packages, largest install)
+
+4. Start NeoVim and enjoy your LaTeX environment!
+
+---
+
+## LaTeX Installation Levels
+
+When you run `setup.sh`, you will be asked to choose one of three LaTeX installation levels:
+
+- **Minimal**: Installs only the essential LaTeX packages for basic documents. Fastest and smallest.
+- **Medium**: Installs core, recommended, math, and font packages. Suitable for most users and most documents.
+- **Full**: Installs all available LaTeX packages. Largest install, but ensures you never run into missing packages.
+
+You can always add more packages later using `pacman` or `tlmgr` as your needs grow.
+
+## Average Disk Space Usage
+
+| Installation Type | Approximate Size |
+|-------------------|------------------|
+| **Minimal**       | ~200 MB          |
+| **Medium**        | ~700 MB          |
+| **Full**          | ~2–3 GB          |
+
+These are rough estimates and may vary depending on updates and dependencies. You can always expand your installation later as needed.
+
+---
 
 ## What's Included
 
