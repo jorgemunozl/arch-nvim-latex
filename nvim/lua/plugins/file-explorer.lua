@@ -133,7 +133,7 @@ return {
         },
         update_focused_file = {
           enable = true,
-          ignore_ft = { 'dashboard', 'NvimTree' }
+          -- ignore_ft = { 'dashboard', 'NvimTree' }
         },
         
         system_open = {
