@@ -46,3 +46,8 @@ require("lazy").setup("plugins", {
 
 -- Load LaTeX-specific settings
 require("config.latex")
+
+-- This is usually not necessary as vimtex does it automatically, so it is problem that is gonna to be resolved in the future!
+vim.api.nvim_set_keymap('n', 'll', '<Plug>(vimtex-compile-ss)', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'lv', '<Plug>(vimtex-view)', { noremap = true, silent = true })
+
