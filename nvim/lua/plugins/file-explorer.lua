@@ -133,10 +133,9 @@ return {
         },
         update_focused_file = {
           enable = true,
-          update_root = false,
-          ignore_list = {},
+          ignore_ft = { 'dashboard', 'NvimTree' }
         },
-        ignore_ft_on_setup = {},
+        
         system_open = {
           cmd = "",
           args = {},

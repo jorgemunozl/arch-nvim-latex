@@ -114,14 +114,11 @@ return {
               }
             },
             {
-              show_macro_recording,
+      
               color = { fg = "#ff9e64" },
             },
           },
           lualine_x = {
-            latex_status,
-            word_count,
-            lsp_client,
             "encoding",
             {
               "fileformat",

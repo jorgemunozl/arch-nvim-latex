@@ -143,8 +143,7 @@ return {
           },
           project = {
             base_dirs = {
-              "~/projects",
-              "~/work",
+            
               "~/Documents",
             },
             hidden_files = true,
