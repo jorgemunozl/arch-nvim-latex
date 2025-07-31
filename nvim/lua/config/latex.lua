@@ -77,7 +77,7 @@ vim.g.vimtex_complete_close_braces = 1
 vim.g.vimtex_quickfix_ignore_filters = {
   'Underfull \\hbox',
   'Overfull \\hbox',
-  'LaTeX Warning: .\+float specifier changed to',
+  'LaTeX Warning: .\\+float specifier changed to',
   'LaTeX hooks Warning',
   'Package hyperref Warning: Token not allowed in a PDF string',
 }

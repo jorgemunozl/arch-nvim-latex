@@ -111,6 +111,7 @@ install_latex() {
             "texlive-bin"
             "texlive-basic"
             "texlive-latex"
+            "texlive-binextra"
             "zathura"
             "zathura-pdf-mupdf"
         )
@@ -123,6 +124,7 @@ install_latex() {
             "texlive-latexrecommended"
             "texlive-fontsrecommended"
             "texlive-mathscience"
+            "texlive-binextra"
             "biber"
             "zathura"
             "zathura-pdf-mupdf"
@@ -141,6 +143,7 @@ install_latex() {
             "texlive-bibtexextra"
             "texlive-mathscience"
             "texlive-publishers"
+            "texlive-binextra"
             "biber"
             "zathura"
             "zathura-pdf-mupdf"

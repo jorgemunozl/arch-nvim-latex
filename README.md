@@ -61,7 +61,8 @@ These are rough estimates and may vary depending on updates and dependencies. Yo
 
 ### System Packages
 - NeoVim (latest version)
-- TexLive (full LaTeX distribution)
+- TexLive (core and selected package groups based on your installation level)
+- texlive-binextra (important for extra utilities like latexmk)
 - Zathura (PDF viewer)
 - Git and development tools
 - Python and Node.js for LSP servers
