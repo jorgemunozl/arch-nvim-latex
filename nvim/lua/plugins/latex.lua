@@ -171,9 +171,9 @@ return {
       
       -- Error format
       vim.g.vimtex_quickfix_ignore_filters = {
-        "Underfull \\\\hbox",
-        "Overfull \\\\hbox",
-        "LaTeX Warning: .\+float specifier changed to",
+        "Underfull \\hbox",
+        "Overfull \\hbox",
+        "LaTeX Warning: .\\+float specifier changed to",
         "LaTeX hooks Warning",
         "Package hyperref Warning: Token not allowed in a PDF string",
       }
