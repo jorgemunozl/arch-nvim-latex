@@ -35,27 +35,28 @@ return {
       
       -- Folding
       vim.g.vimtex_fold_enabled = 1
-      vim.g.vimtex_fold_manual = 1
-      vim.g.vimtex_fold_types = {
-        comments = { enabled = 1 },
-        preamble = { enabled = 1 },
-        parts = { "part", "chapter", "section" },
-        sections = {
-          parse_levels = 1,
-          sections = { "chapter", "section", "subsection" },
-          parts = { "part" },
-        },
-        envs = {
-          blacklist = {},
-          whitelist = { "figure", "table", "equation", "align" },
-        },
-        markers = { enabled = 1 },
-        cmd_single = { enabled = 1 },
-        cmd_single_opt = { enabled = 1 },
-        cmd_multi = { enabled = 1 },
-        delimited = { enabled = 1 },
-      }
-      
+
+-- This is your detailed configuration table, which is structured correctly.
+-- We are just removing the conflicting 'vim.g.vimtex_fold_manual'.
+vim.g.vimtex_fold_types = {
+  comments = { enabled = 1 },
+  envs = {
+    blacklist = {},
+    whitelist = {},
+  },
+  env_options = { enabled = 0 }, -- Set to 1 if you want to fold based on env options
+  markers = { enabled = 0 },     -- Set to 1 to enable marker folding
+  sections = {
+    parse_levels = 1, -- Set to 1 to enable parsing of section levels
+    -- Your section definitions are good
+    parts = { 'part' },
+    chapters = { 'chapter' },
+    sections = { 'section', 'subsection', 'subsubsection' },
+    fakesections = { 'paragraph', 'subparagraph' },
+  },
+}
+
+
       -- Syntax settings
       vim.g.vimtex_syntax_enabled = 1
       vim.g.vimtex_syntax_conceal = {
