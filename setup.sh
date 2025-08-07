@@ -123,7 +123,6 @@ install_base_packages() {
         "npm"
         "python"
         "python-pip"
-        "jre-openjdk-headless"
         "ripgrep"
         "fd"
         "fzf"
@@ -135,6 +134,14 @@ install_base_packages() {
         print_info "Installing $package..."
         sudo pacman -S --needed --noconfirm "$package"
     done
+    
+    # Ensure Java runtime is available for ltex (install only if missing)
+    if ! command -v java &> /dev/null; then
+        print_info "Installing Java runtime (jre-openjdk-headless) for ltex..."
+        sudo pacman -S --needed --noconfirm jre-openjdk-headless
+    else
+        print_info "Java already present: $(java -version 2>&1 | head -n1)"
+    fi
 }
 
 install_latex() {
