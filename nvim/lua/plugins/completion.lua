@@ -21,7 +21,11 @@ return {
       
       -- Load friendly snippets
       require("luasnip.loaders.from_vscode").lazy_load()
-      require("luasnip.loaders.from_vscode").lazy_load({ paths = { "./snippets" } })
+      do
+        local cfg = vim.fn.stdpath("config")
+        local custom_vscode_snip_path = vim.fn.fnamemodify(cfg .. "/../snippets", ":p")
+        require("luasnip.loaders.from_vscode").lazy_load({ paths = { custom_vscode_snip_path } })
+      end
       
       local check_backspace = function()
         local col = vim.fn.col(".") - 1
@@ -199,9 +203,19 @@ return {
           },
         },
       })
+      -- Ensure latex filetype also gets tex snippets and vice versa
+      pcall(function()
+        luasnip.filetype_extend("tex", { "latex", "plaintex" })
+        luasnip.filetype_extend("latex", { "tex", "plaintex" })
+        luasnip.filetype_extend("plaintex", { "tex", "latex" })
+      end)
       
       -- Load custom LaTeX snippets
-      require("luasnip.loaders.from_lua").load({ paths = "./snippets/lua/" })
+      do
+        local cfg = vim.fn.stdpath("config")
+        local custom_lua_snip_path = vim.fn.fnamemodify(cfg .. "/../snippets/lua/", ":p")
+        require("luasnip.loaders.from_lua").load({ paths = custom_lua_snip_path })
+      end
       
       -- Keybindings for snippets
       vim.keymap.set({ "i", "s" }, "<C-l>", function()
