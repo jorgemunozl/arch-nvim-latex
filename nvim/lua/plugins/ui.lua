@@ -146,7 +146,6 @@ return {
         inactive_winbar = {},
         extensions = {
           "nvim-tree",
-          "telescope",
           "fugitive",
           "quickfix",
         }
