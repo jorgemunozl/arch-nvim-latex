@@ -59,6 +59,7 @@ choose_latex_install_level() {
     echo "  1) Minimal   - Only core and basic packages (smallest, fastest)"
     echo "  2) Medium    - Core + recommended + math + fonts (most users)"
     echo "  3) Full      - Everything (all packages, largest)"
+    echo "  4) Deps only - Base tools + Java (no LaTeX install, no config)"
     echo
     local choice
     if $ASSUME_YES; then
@@ -67,11 +68,12 @@ choose_latex_install_level() {
       return
     fi
     while true; do
-        read -p "Enter 1 (Minimal), 2 (Medium), or 3 (Full) [2]: " choice || true
+        read -p "Enter 1 (Minimal), 2 (Medium), 3 (Full), or 4 (Deps) [2]: " choice || true
         case $choice in
             1) LATEX_LEVEL="minimal"; break;;
             2|"") LATEX_LEVEL="medium"; break;;
             3) LATEX_LEVEL="full"; break;;
+            4) LATEX_LEVEL="deps"; break;;
             *) echo "Please enter 1, 2, or 3.";;
         esac
     done
@@ -392,6 +394,53 @@ verify_installation() {
     fi
 }
 
+verify_dependencies() {
+    print_step "Verifying dependencies..."
+    local errors=0
+    if command -v nvim &> /dev/null; then
+        print_info "✓ NeoVim installed: $(nvim --version | head -n1)"
+    else
+        print_error "✗ NeoVim not found"; ((errors++))
+    fi
+    if command -v java &> /dev/null; then
+        print_info "✓ Java installed: $(java -version 2>&1 | head -n1)"
+    else
+        print_error "✗ Java (OpenJDK) not found"; ((errors++))
+    fi
+    if command -v node &> /dev/null; then
+        print_info "✓ Node.js installed: $(node -v)"
+    else
+        print_error "✗ Node.js not found"; ((errors++))
+    fi
+    if command -v npm &> /dev/null; then
+        print_info "✓ npm installed: $(npm -v)"
+    else
+        print_error "✗ npm not found"; ((errors++))
+    fi
+    if command -v python &> /dev/null; then
+        print_info "✓ Python installed: $(python --version 2>&1)"
+    else
+        print_error "✗ Python not found"; ((errors++))
+    fi
+    if command -v rg &> /dev/null; then
+        print_info "✓ ripgrep installed: $(rg --version | head -n1)"
+    else
+        print_error "✗ ripgrep not found"; ((errors++))
+    fi
+    if command -v fzf &> /dev/null; then
+        print_info "✓ fzf installed"
+    else
+        print_error "✗ fzf not found"; ((errors++))
+    fi
+    if [ $errors -eq 0 ]; then
+        print_info "Dependencies verified successfully!"
+        return 0
+    else
+        print_warning "Some dependencies are missing. See above."
+        return 1
+    fi
+}
+
 show_next_steps() {
     print_step "Installation completed!"
     echo
@@ -463,6 +512,16 @@ USAGE
 
     # Ask user for LaTeX installation level
     choose_latex_install_level
+
+    # If dependencies-only was selected, install base and exit
+    if [[ "$LATEX_LEVEL" == "deps" ]]; then
+        check_arch
+        update_system
+        install_base_packages
+        verify_dependencies
+        print_info "Deps-only mode complete. Skipping LaTeX install and config."
+        exit 0
+    fi
 
     # Main installation process
     check_arch
