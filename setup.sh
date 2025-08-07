@@ -3,9 +3,15 @@
 # NeoVim LaTeX Setup Script for Arch Linux
 # This script installs and configures NeoVim with a complete LaTeX environment
 
-set -e  # Exit on any error
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+# Resolve script directory (so we can copy files reliably)
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 
 # Colors for output
+BOLD='\033[1m'
+DIM='\033[2m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -13,28 +19,55 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Logging
-LOG_FILE="install.log"
+LOG_FILE="$SCRIPT_DIR/install_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$LOG_FILE")
 exec 2>&1
 
+# Global defaults (can be set via CLI)
+LATEX_LEVEL=""
+ASSUME_YES=false
+SKIP_AUR=false
+SKIP_LSP=false
+SKIP_ZATHURA=false
+
+# Error handling
+on_error() {
+  local exit_code=$?
+  local line_no=${1:-}
+  echo -e "${RED}[ERROR]${NC} An error occurred ${DIM}(exit=$exit_code, line=$line_no)${NC}"
+  echo -e "${YELLOW}See log for details:${NC} $LOG_FILE"
+  exit "$exit_code"
+}
+trap 'on_error $LINENO' ERR
+
 
 print_header() {
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  NeoVim LaTeX Setup for Arch  ${NC}"
-    echo -e "${BLUE}================================${NC}"
+    echo
+    echo -e "${BLUE}${BOLD}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+    echo -e "${BLUE}${BOLD}┃   NeoVim + LaTeX Setup (Arch Linux)  ┃${NC}"
+    echo -e "${BLUE}${BOLD}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
     echo
 }
 
 # Prompt for LaTeX installation level
 choose_latex_install_level() {
+    if [[ -n "$LATEX_LEVEL" ]]; then
+      print_info "Selected LaTeX installation: $LATEX_LEVEL"
+      return
+    fi
     echo -e "${GREEN}Choose your LaTeX installation level:${NC}"
     echo "  1) Minimal   - Only core and basic packages (smallest, fastest)"
     echo "  2) Medium    - Core + recommended + math + fonts (most users)"
     echo "  3) Full      - Everything (all packages, largest)"
     echo
     local choice
+    if $ASSUME_YES; then
+      LATEX_LEVEL="medium"
+      print_info "Selected LaTeX installation (auto): $LATEX_LEVEL"
+      return
+    fi
     while true; do
-        read -p "Enter 1 (Minimal), 2 (Medium), or 3 (Full) [2]: " choice
+        read -p "Enter 1 (Minimal), 2 (Medium), or 3 (Full) [2]: " choice || true
         case $choice in
             1) LATEX_LEVEL="minimal"; break;;
             2|"") LATEX_LEVEL="medium"; break;;
@@ -46,24 +79,25 @@ choose_latex_install_level() {
 }
 
 print_step() {
-    echo -e "${GREEN}[STEP]${NC} $1"
+    echo -e "${GREEN}➤${NC} $1"
 }
 
 print_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+    echo -e "${BLUE}ℹ${NC} $1"
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    echo -e "${YELLOW}⚠${NC} $1"
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}✖${NC} $1"
 }
 
 check_arch() {
     if ! command -v pacman &> /dev/null; then
-        print_error "This script is designed for Arch Linux and requires pacman"
+        print_error "This script currently supports Arch Linux (pacman) only."
+        echo -e "${YELLOW}Tip:${NC} You can still use the Neovim config by copying ${DIM}$SCRIPT_DIR/nvim${NC} to ${DIM}~/.config/nvim${NC}."
         exit 1
     fi
     print_info "Arch Linux detected ✓"
@@ -156,6 +190,7 @@ install_latex() {
 }
 
 install_aur_packages() {
+    $SKIP_AUR && { print_info "Skipping AUR packages (per flag)"; return; }
     print_step "Installing AUR packages..."
     
     # Check if yay is installed
@@ -188,12 +223,19 @@ setup_neovim_config() {
     mkdir -p "$nvim_config_dir"
     
     # Copy our configuration
-    cp -r nvim/* "$nvim_config_dir/"
+    cp -r "$SCRIPT_DIR/nvim/"* "$nvim_config_dir/"
+    # Copy snippets into nvim config so loaders can find them
+    if [ -d "$SCRIPT_DIR/snippets" ]; then
+        mkdir -p "$nvim_config_dir/snippets"
+        cp -r "$SCRIPT_DIR/snippets/"* "$nvim_config_dir/snippets/" || true
+        print_info "Custom snippets installed to $nvim_config_dir/snippets"
+    fi
     
     print_info "NeoVim configuration installed to $nvim_config_dir"
 }
 
 install_language_servers() {
+    $SKIP_LSP && { print_info "Skipping LSP/tooling install (per flag)"; return; }
     print_step "Installing language servers and tools..."
     
     # Install LSP servers via npm
@@ -211,6 +253,7 @@ install_language_servers() {
 }
 
 configure_zathura() {
+    $SKIP_ZATHURA && { print_info "Skipping Zathura config (per flag)"; return; }
     print_step "Configuring Zathura PDF viewer..."
     
     local zathura_config_dir="$HOME/.config/zathura"
@@ -361,26 +404,46 @@ main() {
     print_header
 
     # Parse command line arguments
-    case "${1:-}" in
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
         --verify)
-            verify_installation
-            exit $?
-            ;;
+          verify_installation; exit $?;;
         --reset)
-            print_step "Resetting NeoVim configuration..."
-            rm -rf "$HOME/.config/nvim"
-            setup_neovim_config
-            print_info "NeoVim configuration reset"
-            exit 0
-            ;;
-        --help)
-            echo "Usage: $0 [--verify|--reset|--help]"
-            echo "  --verify  Verify installation"
-            echo "  --reset   Reset NeoVim configuration"
-            echo "  --help    Show this help"
-            exit 0
-            ;;
-    esac
+          print_step "Resetting NeoVim configuration..."
+          rm -rf "$HOME/.config/nvim"
+          setup_neovim_config
+          print_info "NeoVim configuration reset"
+          exit 0;;
+        --help|-h)
+          cat <<USAGE
+Usage: $0 [options]
+
+Options:
+  --level minimal|medium|full   Choose LaTeX install level (default: prompt or medium with --yes)
+  --yes                         Run non-interactively with sensible defaults
+  --skip-aur                    Skip AUR installs (texlab)
+  --skip-lsp                    Skip installing LSP/tooling
+  --skip-zathura                Skip writing Zathura config
+  --verify                      Verify installation and exit
+  --reset                       Reset NeoVim configuration from repo
+  --help, -h                    Show this help
+USAGE
+          exit 0;;
+        --level)
+          LATEX_LEVEL="${2:-}"; shift;;
+        --yes)
+          ASSUME_YES=true;;
+        --skip-aur)
+          SKIP_AUR=true;;
+        --skip-lsp)
+          SKIP_LSP=true;;
+        --skip-zathura)
+          SKIP_ZATHURA=true;;
+        *)
+          print_warning "Unknown option: $1";;
+      esac
+      shift
+    done
 
     # Ask user for LaTeX installation level
     choose_latex_install_level

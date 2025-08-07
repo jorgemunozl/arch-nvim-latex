@@ -23,7 +23,7 @@ return {
       require("luasnip.loaders.from_vscode").lazy_load()
       do
         local cfg = vim.fn.stdpath("config")
-        local custom_vscode_snip_path = vim.fn.fnamemodify(cfg .. "/../snippets", ":p")
+        local custom_vscode_snip_path = vim.fn.fnamemodify(cfg .. "/snippets", ":p")
         require("luasnip.loaders.from_vscode").lazy_load({ paths = { custom_vscode_snip_path } })
       end
       
@@ -213,7 +213,7 @@ return {
       -- Load custom LaTeX snippets
       do
         local cfg = vim.fn.stdpath("config")
-        local custom_lua_snip_path = vim.fn.fnamemodify(cfg .. "/../snippets/lua/", ":p")
+        local custom_lua_snip_path = vim.fn.fnamemodify(cfg .. "/snippets/lua/", ":p")
         require("luasnip.loaders.from_lua").load({ paths = custom_lua_snip_path })
       end
       
