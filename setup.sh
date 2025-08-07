@@ -123,6 +123,7 @@ install_base_packages() {
         "npm"
         "python"
         "python-pip"
+        "jre-openjdk-headless"
         "ripgrep"
         "fd"
         "fzf"
@@ -356,6 +357,14 @@ verify_installation() {
         print_info "✓ Zathura PDF viewer installed"
     else
         print_error "✗ Zathura PDF viewer not found"
+        ((errors++))
+    fi
+    
+    # Check if Java is installed (required by ltex)
+    if command -v java &> /dev/null; then
+        print_info "✓ Java installed: $(java -version 2>&1 | head -n1)"
+    else
+        print_error "✗ Java (OpenJDK) not found (needed for ltex)"
         ((errors++))
     fi
     

@@ -108,26 +108,35 @@ return {
       })
       
       -- Grammar checking (ltex)
-      lspconfig.ltex.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          ltex = {
-            language = "en-US",
-            diagnosticSeverity = "information",
-            sentenceCacheSize = 2000,
-            additionalRules = {
-              enablePickyRules = true,
-              motherTongue = "en-US",
+      do
+        local has_java = (vim.fn.executable("java") == 1)
+        if has_java then
+          lspconfig.ltex.setup({
+            on_attach = on_attach,
+            capabilities = capabilities,
+            settings = {
+              ltex = {
+                language = "en-US",
+                diagnosticSeverity = "information",
+                sentenceCacheSize = 2000,
+                additionalRules = {
+                  enablePickyRules = true,
+                  motherTongue = "en-US",
+                },
+                trace = { server = "verbose" },
+                dictionary = {},
+                disabledRules = {},
+                hiddenFalsePositives = {},
+              },
             },
-            trace = { server = "verbose" },
-            dictionary = {},
-            disabledRules = {},
-            hiddenFalsePositives = {},
-          },
-        },
-        filetypes = { "latex", "tex", "bib", "markdown" },
-      })
+            filetypes = { "latex", "tex", "bib", "markdown" },
+          })
+        else
+          vim.schedule(function()
+            vim.notify("ltex disabled: Java runtime not found. Install 'jre-openjdk-headless' or set PATH.", vim.log.levels.WARN)
+          end)
+        end
+      end
       
       -- Lua LSP
       lspconfig.lua_ls.setup({
