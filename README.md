@@ -23,7 +23,9 @@ cd arch-nvim-latex
 2. Run the setup script:
 ```bash
 chmod +x setup.sh
-./setup.sh
+./setup.sh                 # interactive
+./setup.sh --yes           # non-interactive (medium)
+./setup.sh --level full --yes --skip-aur   # example with flags
 ```
 
 3. When prompted, choose your LaTeX installation level:
@@ -78,7 +80,6 @@ These are rough estimates and may vary depending on updates and dependencies. Yo
 
 ### LaTeX Tools
 - texlab LSP server
-- ltex LSP for grammar checking
 - VimTeX plugin for LaTeX support
 - Live preview capabilities
 
@@ -98,6 +99,15 @@ These are rough estimates and may vary depending on updates and dependencies. Yo
 - `<leader>ll` - LaTeX live compilation
 - `<leader>lv` - LaTeX view PDF
 
+## Snippets
+- Location: `~/.config/nvim/snippets` (installed by `setup.sh`)
+- Expand/jump: Tab or Ctrl-l
+- Jump back: Shift-Tab or Ctrl-h
+- Choice nodes: Ctrl-k
+- Autosnippets (math): e.g. `@a` → `\alpha`, `fra` → `\frac{…}{…}`, `sq` → `\sqrt{…}`
+- Reload without restarting:
+  - `:lua require('luasnip.loaders.from_lua').load({ paths = vim.fn.stdpath('config')..'/snippets/lua/' })`
+
 ## Customization
 
 Edit the configuration files in `nvim/` directory to customize your setup:
@@ -114,9 +124,14 @@ Edit the configuration files in `nvim/` directory to customize your setup:
 ## Troubleshooting
 
 If you encounter issues:
-1. Check the installation log: `cat install.log`
+1. Check the latest install log (in this repo directory):
+   - `ls -1t install_*.log | head -n1 | xargs -r tail -n +1`
 2. Verify all packages are installed: `./setup.sh --verify`
 3. Reset NeoVim configuration: `./setup.sh --reset`
+4. Snippets not expanding?
+   - Open a `.tex` buffer and run: `:lua print(#require('luasnip').get_snippets('tex'))` (should be > 0)
+   - Reload snippets: `:lua require('luasnip.loaders.from_lua').load({ paths = vim.fn.stdpath('config')..'/snippets/lua/' })`
+   - Ensure VimTeX is active (mathzone): `:echo exists('*vimtex#syntax#in_mathzone')`
 
 ## Contributing
 

@@ -324,7 +324,7 @@ return {
     fmta("\\left| <> \\right| <>", {i(1), i(2)})
   ),
   s({trig = "lra", snippetType = "autosnippet", condition = in_mathzone},
-    fmta("\\left< <> \\right> <>", {i(1), i(2)})
+    fmt("\\left< {} \\right> {}", {i(1), i(2)})
   ),
 
   -- Physics
