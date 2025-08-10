@@ -46,3 +46,32 @@ require("lazy").setup("plugins", {
 
 -- Load LaTeX-specific settings
 require("config.latex")
+
+-- ── VimTeX: use our own keymaps ───────────────────────────────────────────────
+-- 1) Disable all default VimTeX mappings (this removes <localleader>ll, lv, …)
+vim.g.vimtex_mappings_enabled = 0  -- docs: you can fully opt out of defaults
+
+-- 2) Add comfy, buffer-local mappings only for LaTeX files
+--    I use <leader>t… (t = TeX): <leader>tc = compile, <leader>tv = view.
+--    Change <leader> in your config if you like (commonly <Space>).
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'tex',
+  callback = function(ev)
+    local o = { buffer = ev.buf, silent = true, noremap = true }
+
+    -- Compile current project with VimTeX (latexmk by default)
+    vim.keymap.set('n', '<leader>tc', '<cmd>VimtexCompile<CR>', vim.tbl_extend('force', o, {
+      desc = 'TeX: compile (VimTeX)',
+    }))
+
+    -- Open/forward-sync the PDF in your viewer
+    vim.keymap.set('n', '<leader>tv', '<cmd>VimtexView<CR>', vim.tbl_extend('force', o, {
+      desc = 'TeX: view PDF (VimTeX)',
+    }))
+
+    -- (Optional extras — uncomment if you want them)
+    -- vim.keymap.set('n', '<leader>tS', '<cmd>VimtexStop<CR>',     vim.tbl_extend('force', o, { desc = 'TeX: stop compiler' }))
+    -- vim.keymap.set('n', '<leader>tC', '<cmd>VimtexClean<CR>',    vim.tbl_extend('force', o, { desc = 'TeX: clean aux files' }))
+    -- vim.keymap.set('n', '<leader>tt', '<cmd>VimtexTocToggle<CR>',vim.tbl_extend('force', o, { desc = 'TeX: toggle TOC' }))
+  end,
+})
