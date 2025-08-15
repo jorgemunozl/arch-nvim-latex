@@ -51,7 +51,7 @@ autocmd("FileType", {
   callback = function()
     vim.opt_local.wrap = true           -- Enable line wrapping for LaTeX
     vim.opt_local.linebreak = true      -- Break lines at word boundaries
-    vim.opt_local.textwidth = 80        -- Set text width to 80 characters
+    vim.opt_local.textwidth = 0         -- Do not hard-wrap LaTeX files
     vim.opt_local.spell = true          -- Enable spell checking
     vim.opt_local.spelllang = "en_us"   -- Set spell check language
     vim.opt_local.conceallevel = 2      -- Enable concealing

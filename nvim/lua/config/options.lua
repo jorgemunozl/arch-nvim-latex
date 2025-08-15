@@ -14,6 +14,7 @@ opt.relativenumber = true          -- Show relative line numbers
 opt.cursorline = true             -- Highlight current line
 opt.signcolumn = "yes"            -- Always show sign column
 opt.colorcolumn = "80"            -- Show column at 80 characters
+opt.textwidth = 0                 -- Disable automatic hard wrapping
 opt.scrolloff = 8                 -- Keep 8 lines above/below cursor
 opt.sidescrolloff = 8             -- Keep 8 columns left/right of cursor
 opt.wrap = false                  -- Don't wrap lines
