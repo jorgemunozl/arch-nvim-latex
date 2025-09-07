@@ -60,12 +60,12 @@ vim.api.nvim_create_autocmd('FileType', {
     local o = { buffer = ev.buf, silent = true, noremap = true }
 
     -- Compile current project with VimTeX (latexmk by default)
-    vim.keymap.set('n', '<leader>tc', '<cmd>VimtexCompile<CR>', vim.tbl_extend('force', o, {
+    vim.keymap.set('n', 'tt', '<cmd>VimtexCompile<CR>', vim.tbl_extend('force', o, {
       desc = 'TeX: compile (VimTeX)',
     }))
 
     -- Open/forward-sync the PDF in your viewer
-    vim.keymap.set('n', '<leader>tv', '<cmd>VimtexView<CR>', vim.tbl_extend('force', o, {
+    vim.keymap.set('n', 'tv', '<cmd>VimtexView<CR>', vim.tbl_extend('force', o, {
       desc = 'TeX: view PDF (VimTeX)',
     }))
 
