@@ -125,6 +125,7 @@ install_base_packages() {
         "npm"
         "python"
         "python-pip"
+        "python-neovim-remote"
         "ripgrep"
         "fd"
         "fzf"
@@ -143,6 +144,34 @@ install_base_packages() {
         sudo pacman -S --needed --noconfirm jre-openjdk-headless
     else
         print_info "Java already present: $(java -version 2>&1 | head -n1)"
+    fi
+}
+
+ensure_nvr() {
+    print_step "Ensuring neovim-remote (nvr) is available..."
+    if command -v nvr &> /dev/null; then
+        print_info "nvr already installed"
+        return
+    fi
+
+    local pip_cmd=""
+    if command -v pip &> /dev/null; then
+        pip_cmd="pip"
+    elif command -v pip3 &> /dev/null; then
+        pip_cmd="pip3"
+    fi
+    
+    if [[ -n "$pip_cmd" ]]; then
+        print_info "Installing neovim-remote via $pip_cmd (user)..."
+        $pip_cmd install --user neovim-remote || true
+    else
+        print_warning "pip not found; skipping pip install for neovim-remote"
+    fi
+
+    if command -v nvr &> /dev/null; then
+        print_info "nvr installed successfully"
+    else
+        print_warning "nvr is still missing. Inverse search will be disabled until nvr is installed and on PATH."
     fi
 }
 
@@ -298,6 +327,10 @@ set inputbar-fg "#d4d4d4"
 
 # Font
 set font "JetBrains Mono 11"
+
+# SyncTeX inverse search with Neovim (requires nvr in PATH)
+set synctex true
+set synctex-editor-command "nvr --remote-silent +%{line} %{input}"
 EOF
     
     print_info "Zathura configured"
@@ -367,6 +400,12 @@ verify_installation() {
     else
         print_error "✗ Zathura PDF viewer not found"
         ((errors++))
+    fi
+
+    if command -v nvr &> /dev/null; then
+        print_info "✓ nvr (neovim-remote) installed for inverse search"
+    else
+        print_warning "⚠ nvr not found; inverse search from Zathura will be disabled"
     fi
     
     # Check if Java is installed (required by ltex)
@@ -518,6 +557,7 @@ USAGE
         check_arch
         update_system
         install_base_packages
+        ensure_nvr
         verify_dependencies
         print_info "Deps-only mode complete. Skipping LaTeX install and config."
         exit 0
@@ -527,6 +567,7 @@ USAGE
     check_arch
     update_system
     install_base_packages
+    ensure_nvr
     install_latex
     install_aur_packages
     setup_neovim_config

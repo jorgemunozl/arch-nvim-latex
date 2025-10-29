@@ -52,8 +52,7 @@ require("config.latex")
 vim.g.vimtex_mappings_enabled = 0  -- docs: you can fully opt out of defaults
 
 -- 2) Add comfy, buffer-local mappings only for LaTeX files
---    I use <leader>t… (t = TeX): <leader>tc = compile, <leader>tv = view.
---    Change <leader> in your config if you like (commonly <Space>).
+--    I use t… (t = TeX) in normal mode: tt = compile, tc = toc, te/ta = math envs, tv = view.
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'tex',
   callback = function(ev)
@@ -64,6 +63,36 @@ vim.api.nvim_create_autocmd('FileType', {
       desc = 'TeX: compile (VimTeX)',
     }))
 
+    local function insert_env(env)
+      return function()
+        local buf = vim.api.nvim_get_current_buf()
+        local pos = vim.api.nvim_win_get_cursor(0)
+        local row = pos[1]
+        local current_line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
+        local indent = current_line:match('^%s*') or ''
+        local snippet = {
+          indent .. '\\begin{' .. env .. '}',
+          indent .. '  ',
+          indent .. '\\end{' .. env .. '}',
+        }
+        vim.api.nvim_buf_set_lines(buf, row, row, false, snippet)
+        vim.api.nvim_win_set_cursor(0, { row + 1, #indent + 2 })
+      end
+    end
+
+    -- Insert equation/align environments with matching indentation
+    vim.keymap.set('n', 'te', insert_env('equation'), vim.tbl_extend('force', o, {
+      desc = 'TeX: insert equation environment',
+    }))
+    vim.keymap.set('n', 'ta', insert_env('align'), vim.tbl_extend('force', o, {
+      desc = 'TeX: insert align environment',
+    }))
+
+    -- Toggle the structured table of contents window
+    vim.keymap.set('n', 'tc', '<cmd>VimtexTocToggle<CR>', vim.tbl_extend('force', o, {
+      desc = 'TeX: toggle TOC (VimTeX)',
+    }))
+
     -- Open/forward-sync the PDF in your viewer
     vim.keymap.set('n', 'tv', '<cmd>VimtexView<CR>', vim.tbl_extend('force', o, {
       desc = 'TeX: view PDF (VimTeX)',
@@ -72,6 +101,5 @@ vim.api.nvim_create_autocmd('FileType', {
     -- (Optional extras — uncomment if you want them)
     -- vim.keymap.set('n', '<leader>tS', '<cmd>VimtexStop<CR>',     vim.tbl_extend('force', o, { desc = 'TeX: stop compiler' }))
     -- vim.keymap.set('n', '<leader>tC', '<cmd>VimtexClean<CR>',    vim.tbl_extend('force', o, { desc = 'TeX: clean aux files' }))
-    -- vim.keymap.set('n', '<leader>tt', '<cmd>VimtexTocToggle<CR>',vim.tbl_extend('force', o, { desc = 'TeX: toggle TOC' }))
   end,
 })

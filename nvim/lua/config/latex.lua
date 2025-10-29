@@ -6,7 +6,16 @@ vim.g.auto_compile_latex = false  -- Set to true to enable auto-compilation on s
 -- VimTeX configuration (will be set when plugin loads)
 vim.g.vimtex_view_method = 'zathura'
 vim.g.vimtex_view_general_viewer = 'zathura'
+vim.g.vimtex_view_general_options = [[--unique file:@pdf\#src:@line@tex]]
+vim.g.vimtex_view_general_options_latexmk = [[--unique]]
 vim.g.vimtex_compiler_method = 'latexmk'
+
+do
+  local nvr = vim.fn.exepath("nvr")
+  if nvr ~= "" then
+    vim.g.vimtex_callback_progpath = nvr
+  end
+end
 
 -- Compiler options
 vim.g.vimtex_compiler_latexmk = {
